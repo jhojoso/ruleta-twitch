@@ -1657,7 +1657,7 @@
         client.connect().then(() => console.log("Conectado al chat de Jhojoso")).catch(console.error);
 
         client.on('message', (channel, tags, message, self) => {
-            if (message.toLowerCase() === '!join') {
+            if (message.toLowerCase() === '!pocho') {
                 const name = tags['display-name'];
                 if (!participants.includes(name)) {
                     participants.push(name);
