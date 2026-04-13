@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ruleta Jhojoso</title>
+    <script src="https://bundle.run/tmi.js@1.8.5"></script>
+    <style>
+        body { background: #111; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        canvas { border: 8px solid #9146FF; border-radius: 50%; box-shadow: 0 0 30px rgba(145, 70, 255, 0.5); max-width: 90vw; max-height: 70vh; }
+        .stats { font-size: 1.5rem; margin-bottom: 10px; color: #bf94ff; font-weight: bold; }
+        .controls { margin-top: 20px; }
+        button { background: #9146FF; border: none; color: white; padding: 15px 30px; cursor: pointer; border-radius: 8px; font-size: 1.2rem; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #772ce8; transform: scale(1.05); }
+        #winner-display { position: fixed; top: 20px; background: rgba(145, 70, 255, 0.9); padding: 20px; border-radius: 15px; display: none; font-size: 2rem; animation: pop 0.5s ease; }
+        @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div id="winner-display"></div>
+    <div class="stats">Participantes: <span id="count">0</span></div>
+    <canvas id="canvas" width="500" height="500"></canvas>
+    
+    <div class="controls">
+        <button onclick="spinWheel()">¡GIRAR!</button>
+        <button onclick="resetParticipants()" style="background:#444; margin-left: 10px;">Reset</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const countEl = document.getElementById('count');
+        const winnerEl = document.getElementById('winner-display');
+
+        let participants = [];
+        let startAngle = 0;
+        let arc = 0;
+
+        // CONFIGURACIÓN - Solo cambia 'jhojoso' si es necesario
+        const client = new tmi.Client({
+            connection: { secure: true, reconnect: true },
+            channels: ['jhojoso']
+        });
+
+        client.connect().then(() => console.log("Conectado al chat de Jhojoso")).catch(console.error);
+
+        client.on('message', (channel, tags, message, self) => {
+            if (message.toLowerCase() === '!join') {
+                const name = tags['display-name'];
+                if (!participants.includes(name)) {
+                    participants.push(name);
+                    updateStats();
+                    drawRoulette();
+                }
+            }
+        });
+
+        function updateStats() { countEl.innerText = participants.length; }
+
+        function drawRoulette() {
+            if (participants.length === 0) return;
+            arc = Math.PI / (participants.length / 2);
+            ctx.clearRect(0, 0, 500, 500);
+            participants.forEach((name, i) => {
+                const angle = startAngle + i * arc;
+                ctx.fillStyle = i % 2 === 0 ? "#9146FF" : "#ffffff";
+                ctx.beginPath();
+                ctx.moveTo(250, 250);
+                ctx.arc(250, 250, 240, angle, angle + arc, false);
+                ctx.lineTo(250, 250);
+                ctx.fill();
+                ctx.save();
+                ctx.fillStyle = i % 2 === 0 ? "white" : "black";
+                ctx.translate(250 + Math.cos(angle + arc / 2) * 170, 250 + Math.sin(angle + arc / 2) * 170);
+                ctx.rotate(angle + arc / 2 + Math.PI / 2);
+                ctx.font = "bold 14px Arial";
+                ctx.fillText(name, -ctx.measureText(name).width / 2, 0);
+                ctx.restore();
+            });
+        }
+
+        let spinning = false;
+        function spinWheel() {
+            if (spinning || participants.length < 2) return;
+            spinning = true;
+            winnerEl.style.display = 'none';
+            let spinAngleStart = Math.random() * 10 + 20;
+            let spinTime = 0;
+            let spinTimeTotal = Math.random() * 3 + 4 * 1000;
+
+            function rotate() {
+                spinTime += 30;
+                if (spinTime >= spinTimeTotal) {
+                    spinning = false;
+                    const degrees = startAngle * 180 / Math.PI + 90;
+                    const index = Math.floor((360 - degrees % 360) / (arc * 180 / Math.PI));
+                    const winner = participants[index >= participants.length ? 0 : index];
+                    winnerEl.innerText = "¡GANADOR: " + winner + "!";
+                    winnerEl.style.display = 'block';
+                    return;
+                }
+                const ease = (t, b, c, d) => b + c * ((t /= d) * t * t);
+                const delta = spinAngleStart - ease(spinTime, 0, spinAngleStart, spinTimeTotal);
+                startAngle += (delta * Math.PI / 180);
+                drawRoulette();
+                setTimeout(rotate, 30);
+            }
+            rotate();
+        }
+
+        function resetParticipants() {
+            participants = [];
+            updateStats();
+            ctx.clearRect(0, 0, 500, 500);
+            winnerEl.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
