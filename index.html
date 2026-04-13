@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>La Pocho Ruleta - Medieval Edition</title>
+    <title>La Pocho Ruleta - Gestión de Premios</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&display=swap" rel="stylesheet">
     <script>
         ! function s(o, i, r) {
@@ -1617,139 +1617,179 @@
 	}, {}]
 }, {}, [1]);
     </script>
-   <style>
+  <style>
         body { 
-            background: radial-gradient(circle, #2c1a1a 0%, #111 100%); /* Fondo tipo antorcha */
-            color: #d4af37; /* Oro viejo */
+            background: radial-gradient(circle, #2c1a1a 0%, #111 100%);
+            color: #d4af37;
             font-family: 'MedievalSharp', cursive;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
             margin: 0; 
-            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* Título Estilo Metal Cincelado */
         .main-title {
             font-family: 'Cinzel', serif;
-            font-size: 3.5rem;
+            font-size: 3rem;
             color: #e5e5e5;
-            text-transform: uppercase;
-            margin: 0;
-            text-shadow: 2px 2px 0px #000, 0 0 15px #ff4500; /* Resplandor de fuego */
-            letter-spacing: 5px;
+            margin: 10px 0;
+            text-shadow: 2px 2px 0px #000, 0 0 15px #ff4500;
+            text-align: center;
         }
 
-        .stats { 
-            font-size: 1.4rem; 
-            margin-bottom: 20px; 
-            color: #8b4513; /* Color cuero/madera */
-            text-shadow: 1px 1px 2px black;
+        /* Contenedor Principal en dos columnas */
+        .app-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 40px;
+            width: 95%;
+            max-width: 1200px;
+        }
+
+        /* SECCIÓN IZQUIERDA: RULETA */
+        .wheel-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .wheel-wrapper {
             position: relative;
-            display: inline-block;
-            padding: 20px;
             background: #1a1a1a;
+            padding: 15px;
             border-radius: 50%;
             border: 5px solid #333;
-            box-shadow: inset 0 0 50px #000;
         }
 
-        /* FLECHA: Ahora es una punta de flecha forjada */
         .arrow {
             position: absolute;
             top: -5px;
             left: 50%;
             transform: translateX(-50%);
-            width: 0; 
-            height: 0; 
+            width: 0; height: 0; 
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-top: 50px solid #8b0000; /* Rojo sangre/vino */
+            border-top: 50px solid #8b0000;
             z-index: 10;
-            filter: drop-shadow(0 0 5px #000);
-        }
-        .arrow:after {
-            content: "";
-            position: absolute;
-            top: -55px;
-            left: -5px;
-            width: 10px;
-            height: 20px;
-            background: #444; /* Mango de la flecha */
         }
 
         canvas { 
-            border: 15px solid #4a4a4a; /* Marco de hierro */
+            border: 12px solid #4a4a4a;
             border-radius: 50%; 
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
-            background: #2a1b12; /* Fondo madera oscura */
+            background: #2a1b12;
         }
 
-        .controls { margin-top: 30px; }
+        /* SECCIÓN DERECHA: LISTA */
+        .list-section {
+            width: 300px;
+            background: #e3c58e; /* Fondo Pergamino */
+            border: 8px double #8b4513;
+            border-radius: 5px;
+            height: 550px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+        }
 
-        /* Botones estilo tablón de madera */
-        button { 
+        .list-header {
+            background: #8b4513;
+            color: #e3c58e;
+            padding: 10px;
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            margin: 0;
+        }
+
+        #participant-list {
+            list-style: none;
+            padding: 10px;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+            color: #3d2b1f;
+        }
+
+        .participant-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid rgba(139, 69, 19, 0.3);
+            font-size: 1.1rem;
+        }
+
+        .delete-btn {
+            background: #8b0000;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            padding: 2px 8px;
+            font-family: 'MedievalSharp';
+            font-size: 0.8rem;
+        }
+
+        .delete-btn:hover { background: #ff0000; }
+
+        /* BOTONES Y ALERTAS */
+        .controls { margin-top: 20px; }
+        button.main-btn { 
             background: #5d3a1a; 
             border: 3px solid #3d2b1f;
             color: #d4af37; 
-            padding: 15px 35px; 
-            cursor: pointer; 
-            border-radius: 4px; 
-            font-size: 1.3rem; 
-            font-family: 'MedievalSharp', cursive;
-            font-weight: bold; 
-            transition: 0.3s;
-            box-shadow: 0 6px 0 #2a1b12, 0 8px 15px rgba(0,0,0,0.5);
-            text-transform: uppercase;
+            padding: 12px 30px; 
+            cursor: pointer;
+            font-family: 'MedievalSharp';
+            font-size: 1.2rem;
+            box-shadow: 0 4px 0 #2a1b12;
         }
 
-        button:hover { 
-            background: #7a4d26; 
-            color: #fff;
-            transform: translateY(-2px);
-        }
-
-        button:active { transform: translateY(4px); box-shadow: none; }
-
-        /* Pantalla de Ganador estilo Pergamino */
         #winner-display { 
             position: fixed; 
-            top: 15%; 
-            background: #e3c58e; /* Color pergamino */
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-2deg);
+            background: #e3c58e;
             color: #3d2b1f;
-            padding: 30px 60px; 
+            padding: 30px; 
             border-radius: 5px; 
             display: none; 
-            font-size: 2.5rem; 
-            font-weight: bold;
+            font-size: 2.2rem; 
             border: 10px double #8b4513;
-            box-shadow: 0 0 100px rgba(0,0,0,0.8);
             z-index: 100;
             text-align: center;
-            transform: rotate(-2deg);
         }
     </style>
 </head>
 <body>
 
     <h1 class="main-title">La Pocho Ruleta</h1>
-    <div class="stats">Escuderos en espera: <span id="count">0</span></div>
 
     <div id="winner-display"></div>
 
-    <div class="wheel-wrapper">
-        <div class="arrow"></div>
-        <canvas id="canvas" width="500" height="500"></canvas>
-    </div>
-    
-    <div class="controls">
-        <button onclick="spinWheel()">⚔️ ¡INICIAR SORTEO! ⚔️</button>
-        <button onclick="resetParticipants()" style="background:#2a2a2a; border-color:#111; color:#666; font-size: 0.9rem; margin-left: 15px;">Limpiar</button>
+    <div class="app-container">
+        <div class="wheel-section">
+            <div class="wheel-wrapper">
+                <div class="arrow"></div>
+                <canvas id="canvas" width="500" height="500"></canvas>
+            </div>
+            <div class="controls">
+                <button class="main-btn" onclick="spinWheel()">⚔️ GIRAR RULETA ⚔️</button>
+                <button onclick="resetParticipants()" style="background:transparent; border:none; color:#666; cursor:pointer; margin-top:10px; display:block; width:100%;">Limpiar Todo</button>
+            </div>
+        </div>
+
+        <div class="list-section">
+            <h2 class="list-header">Registro de Escuderos</h2>
+            <div style="padding: 5px; text-align: center; color: #8b4513; font-size: 0.9rem;">
+                Total: <span id="count">0</span>
+            </div>
+            <ul id="participant-list">
+                </ul>
+        </div>
     </div>
 
     <script>
@@ -1757,6 +1797,7 @@
         const ctx = canvas.getContext('2d');
         const countEl = document.getElementById('count');
         const winnerEl = document.getElementById('winner-display');
+        const listEl = document.getElementById('participant-list');
 
         let participants = [];
         let startAngle = 0;
@@ -1774,34 +1815,52 @@
                 const name = tags['display-name'];
                 if (!participants.includes(name)) {
                     participants.push(name);
-                    updateStats();
-                    drawRoulette();
+                    updateUI();
                 }
             }
         });
 
-        function updateStats() { countEl.innerText = participants.length; }
+        function updateUI() {
+            countEl.innerText = participants.length;
+            renderList();
+            drawRoulette();
+        }
+
+        function renderList() {
+            listEl.innerHTML = "";
+            participants.forEach((name, index) => {
+                const li = document.createElement('li');
+                li.className = 'participant-item';
+                li.innerHTML = `
+                    <span>${name}</span>
+                    <button class="delete-btn" onclick="removeParticipant(${index})">X</button>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+
+        function removeParticipant(index) {
+            participants.splice(index, 1);
+            updateUI();
+        }
 
         function drawRoulette() {
-            if (participants.length === 0) return;
+            if (participants.length === 0) {
+                ctx.clearRect(0, 0, 500, 500);
+                return;
+            }
             arc = Math.PI / (participants.length / 2);
             ctx.clearRect(0, 0, 500, 500);
             
             participants.forEach((name, i) => {
                 const angle = startAngle + i * arc;
-                
-                // Colores: Oro Oscuro y Hierro Forjado
                 ctx.fillStyle = i % 2 === 0 ? "#b8860b" : "#1a1a1a";
-                
                 ctx.beginPath();
                 ctx.moveTo(250, 250);
                 ctx.arc(250, 250, 240, angle, angle + arc, false);
                 ctx.lineTo(250, 250);
                 ctx.fill();
-                
-                // Bordes de las celdas
                 ctx.strokeStyle = "#3d2b1f";
-                ctx.lineWidth = 2;
                 ctx.stroke();
 
                 ctx.save();
@@ -1812,13 +1871,6 @@
                 ctx.fillText(name, -ctx.measureText(name).width / 2, 0);
                 ctx.restore();
             });
-
-            // Eje central de bronce
-            ctx.beginPath();
-            ctx.arc(250, 250, 15, 0, 2 * Math.PI);
-            ctx.fillStyle = "#cd7f32";
-            ctx.fill();
-            ctx.stroke();
         }
 
         let spinning = false;
@@ -1839,7 +1891,7 @@
                     const index = Math.floor((360 - degrees % 360) / arcd);
                     const winner = participants[index >= participants.length ? 0 : index];
                     
-                    winnerEl.innerHTML = "📜 DECRETO REAL 📜<br><small>El pocho ganador es:</small><br><span style='font-size: 3.5rem; color: #8b0000;'>" + winner + "</span>";
+                    winnerEl.innerHTML = "📜 DECRETO REAL 📜<br><small>El pocho ganador es:</small><br><span style='font-size: 3.5rem; color: #8b0000;'>" + winner + "</span><br><button onclick='this.parentElement.style.display=\"none\"' style='margin-top:10px; cursor:pointer;'>Cerrar</button>";
                     winnerEl.style.display = 'block';
                     return;
                 }
@@ -1857,13 +1909,13 @@
 
         function resetParticipants() {
             participants = [];
-            updateStats();
-            ctx.clearRect(0, 0, 500, 500);
+            updateUI();
             winnerEl.style.display = 'none';
         }
 
         window.spinWheel = spinWheel;
         window.resetParticipants = resetParticipants;
+        window.removeParticipant = removeParticipant;
     </script>
 </body>
 </html>
