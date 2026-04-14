@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>La Pocho Ruleta - Gestión de Premios</title>
+    <title>La Pocho Ruleta - Sistema de Reclamo</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&display=swap" rel="stylesheet">
     <script>
         ! function s(o, i, r) {
@@ -1617,158 +1617,58 @@
 	}, {}]
 }, {}, [1]);
     </script>
-  <style>
+ <style>
         body { 
             background: radial-gradient(circle, #2c1a1a 0%, #111 100%);
             color: #d4af37;
             font-family: 'MedievalSharp', cursive;
-            margin: 0; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            margin: 0; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden;
         }
 
-        .main-title {
-            font-family: 'Cinzel', serif;
-            font-size: 3rem;
-            color: #e5e5e5;
-            margin: 10px 0;
-            text-shadow: 2px 2px 0px #000, 0 0 15px #ff4500;
-            text-align: center;
-        }
+        .main-title { font-family: 'Cinzel', serif; font-size: 3rem; color: #e5e5e5; margin: 10px 0; text-shadow: 2px 2px 0px #000, 0 0 15px #ff4500; }
 
-        /* Contenedor Principal en dos columnas */
-        .app-container {
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-            justify-content: center;
-            gap: 40px;
-            width: 95%;
-            max-width: 1200px;
-        }
+        .app-container { display: flex; flex-direction: row; align-items: flex-start; justify-content: center; gap: 40px; width: 95%; max-width: 1200px; }
 
-        /* SECCIÓN IZQUIERDA: RULETA */
-        .wheel-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        /* RULETA */
+        .wheel-section { display: flex; flex-direction: column; align-items: center; }
+        .wheel-wrapper { position: relative; background: #1a1a1a; padding: 15px; border-radius: 50%; border: 5px solid #333; }
+        .arrow { position: absolute; top: -5px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 50px solid #8b0000; z-index: 10; }
+        canvas { border: 12px solid #4a4a4a; border-radius: 50%; background: #2a1b12; }
 
-        .wheel-wrapper {
-            position: relative;
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 50%;
-            border: 5px solid #333;
-        }
+        /* LISTA LATERAL */
+        .list-section { width: 300px; background: #e3c58e; border: 8px double #8b4513; border-radius: 5px; height: 550px; display: flex; flex-direction: column; box-shadow: 0 0 30px rgba(0,0,0,0.7); }
+        .list-header { background: #8b4513; color: #e3c58e; padding: 10px; text-align: center; font-family: 'Cinzel', serif; margin: 0; }
+        #participant-list { list-style: none; padding: 10px; margin: 0; overflow-y: auto; flex-grow: 1; color: #3d2b1f; }
+        .participant-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(139, 69, 19, 0.3); font-size: 1.1rem; }
+        .delete-btn { background: #8b0000; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 8px; font-family: 'MedievalSharp'; }
 
-        .arrow {
-            position: absolute;
-            top: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0; 
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 50px solid #8b0000;
-            z-index: 10;
-        }
-
-        canvas { 
-            border: 12px solid #4a4a4a;
-            border-radius: 50%; 
-            background: #2a1b12;
-        }
-
-        /* SECCIÓN DERECHA: LISTA */
-        .list-section {
-            width: 300px;
-            background: #e3c58e; /* Fondo Pergamino */
-            border: 8px double #8b4513;
-            border-radius: 5px;
-            height: 550px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 30px rgba(0,0,0,0.7);
-        }
-
-        .list-header {
-            background: #8b4513;
-            color: #e3c58e;
-            padding: 10px;
-            text-align: center;
-            font-family: 'Cinzel', serif;
-            margin: 0;
-        }
-
-        #participant-list {
-            list-style: none;
-            padding: 10px;
-            margin: 0;
-            overflow-y: auto;
-            flex-grow: 1;
-            color: #3d2b1f;
-        }
-
-        .participant-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            border-bottom: 1px solid rgba(139, 69, 19, 0.3);
-            font-size: 1.1rem;
-        }
-
-        .delete-btn {
-            background: #8b0000;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            padding: 2px 8px;
-            font-family: 'MedievalSharp';
-            font-size: 0.8rem;
-        }
-
-        .delete-btn:hover { background: #ff0000; }
-
-        /* BOTONES Y ALERTAS */
-        .controls { margin-top: 20px; }
-        button.main-btn { 
-            background: #5d3a1a; 
-            border: 3px solid #3d2b1f;
-            color: #d4af37; 
-            padding: 12px 30px; 
-            cursor: pointer;
-            font-family: 'MedievalSharp';
-            font-size: 1.2rem;
-            box-shadow: 0 4px 0 #2a1b12;
-        }
-
+        /* PERGAMINO DE GANADOR Y CRONÓMETRO */
         #winner-display { 
-            position: fixed; 
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-2deg);
-            background: #e3c58e;
-            color: #3d2b1f;
-            padding: 30px; 
-            border-radius: 5px; 
-            display: none; 
-            font-size: 2.2rem; 
-            border: 10px double #8b4513;
-            z-index: 100;
-            text-align: center;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #e3c58e; color: #3d2b1f; padding: 40px; border-radius: 5px; 
+            display: none; font-size: 2.2rem; border: 10px double #8b4513; z-index: 100; text-align: center;
+            box-shadow: 0 0 100px rgba(0,0,0,0.9); width: 450px;
         }
+        .timer-text { font-size: 4rem; color: #8b0000; font-weight: bold; margin: 15px 0; }
+        .claim-status { font-size: 1.5rem; font-style: italic; color: #5d3a1a; }
+
+        button.main-btn { background: #5d3a1a; border: 3px solid #3d2b1f; color: #d4af37; padding: 12px 30px; cursor: pointer; font-family: 'MedievalSharp'; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
     <h1 class="main-title">La Pocho Ruleta</h1>
 
-    <div id="winner-display"></div>
+    <div id="winner-display">
+        <div id="winner-content">
+            📜 DECRETO REAL 📜<br>
+            <small>El pocho ganador es:</small><br>
+            <span id="winner-name" style="font-size: 3.5rem; color: #8b0000; display: block;">---</span>
+            <div class="claim-status" id="claim-instruction">¡DEBE HABLAR EN EL CHAT PARA RECLAMAR!</div>
+            <div class="timer-text" id="countdown">30</div>
+            <button onclick="closeWinnerDisplay()" style="cursor:pointer; padding: 5px 15px;">Cerrar Pergamino</button>
+        </div>
+    </div>
 
     <div class="app-container">
         <div class="wheel-section">
@@ -1784,11 +1684,8 @@
 
         <div class="list-section">
             <h2 class="list-header">Pocho Participantes</h2>
-            <div style="padding: 5px; text-align: center; color: #8b4513; font-size: 0.9rem;">
-                Total: <span id="count">0</span>
-            </div>
-            <ul id="participant-list">
-                </ul>
+            <div style="padding: 5px; text-align: center; color: #8b4513; font-size: 0.9rem;">Total: <span id="count">0</span></div>
+            <ul id="participant-list"></ul>
         </div>
     </div>
 
@@ -1797,11 +1694,18 @@
         const ctx = canvas.getContext('2d');
         const countEl = document.getElementById('count');
         const winnerEl = document.getElementById('winner-display');
+        const winnerNameEl = document.getElementById('winner-name');
+        const countdownEl = document.getElementById('countdown');
+        const claimStatusEl = document.getElementById('claim-instruction');
         const listEl = document.getElementById('participant-list');
 
         let participants = [];
         let startAngle = 0;
         let arc = 0;
+        let currentWinner = null;
+        let isClaimPhase = false;
+        let timerSeconds = 30;
+        let timerInterval = null;
 
         const client = new tmi.Client({
             connection: { secure: true, reconnect: true },
@@ -1811,12 +1715,20 @@
         client.connect().catch(console.error);
 
         client.on('message', (channel, tags, message, self) => {
+            if (self) return;
+            const chatName = tags['display-name'];
+
+            // 1. Unirse a la ruleta
             if (message.toLowerCase() === '!pocho') {
-                const name = tags['display-name'];
-                if (!participants.includes(name)) {
-                    participants.push(name);
+                if (!participants.includes(chatName)) {
+                    participants.push(chatName);
                     updateUI();
                 }
+            }
+
+            // 2. Lógica de Reclamo
+            if (isClaimPhase && chatName.toLowerCase() === currentWinner.toLowerCase()) {
+                claimPrize();
             }
         });
 
@@ -1831,10 +1743,7 @@
             participants.forEach((name, index) => {
                 const li = document.createElement('li');
                 li.className = 'participant-item';
-                li.innerHTML = `
-                    <span>${name}</span>
-                    <button class="delete-btn" onclick="removeParticipant(${index})">X</button>
-                `;
+                li.innerHTML = `<span>${name}</span><button class="delete-btn" onclick="removeParticipant(${index})">X</button>`;
                 listEl.appendChild(li);
             });
         }
@@ -1845,24 +1754,16 @@
         }
 
         function drawRoulette() {
-            if (participants.length === 0) {
-                ctx.clearRect(0, 0, 500, 500);
-                return;
-            }
+            if (participants.length === 0) { ctx.clearRect(0, 0, 500, 500); return; }
             arc = Math.PI / (participants.length / 2);
             ctx.clearRect(0, 0, 500, 500);
-            
             participants.forEach((name, i) => {
                 const angle = startAngle + i * arc;
                 ctx.fillStyle = i % 2 === 0 ? "#b8860b" : "#1a1a1a";
-                ctx.beginPath();
-                ctx.moveTo(250, 250);
+                ctx.beginPath(); ctx.moveTo(250, 250);
                 ctx.arc(250, 250, 240, angle, angle + arc, false);
-                ctx.lineTo(250, 250);
-                ctx.fill();
-                ctx.strokeStyle = "#3d2b1f";
-                ctx.stroke();
-
+                ctx.lineTo(250, 250); ctx.fill();
+                ctx.strokeStyle = "#3d2b1f"; ctx.stroke();
                 ctx.save();
                 ctx.fillStyle = i % 2 === 0 ? "#1a1a1a" : "#d4af37";
                 ctx.translate(250 + Math.cos(angle + arc / 2) * 170, 250 + Math.sin(angle + arc / 2) * 170);
@@ -1878,6 +1779,8 @@
             if (spinning || participants.length < 2) return;
             spinning = true;
             winnerEl.style.display = 'none';
+            clearInterval(timerInterval);
+            
             let spinAngleStart = Math.random() * 10 + 25;
             let spinTime = 0;
             let spinTimeTotal = Math.random() * 3 + 5 * 1000;
@@ -1887,34 +1790,64 @@
                 if (spinTime >= spinTimeTotal) {
                     spinning = false;
                     const degrees = startAngle * 180 / Math.PI + 90;
-                    const arcd = arc * 180 / Math.PI;
-                    const index = Math.floor((360 - degrees % 360) / arcd);
-                    const winner = participants[index >= participants.length ? 0 : index];
+                    const index = Math.floor((360 - degrees % 360) / (arc * 180 / Math.PI));
+                    currentWinner = participants[index >= participants.length ? 0 : index];
                     
-                    winnerEl.innerHTML = "📜 DECRETO REAL 📜<br><small>El pocho ganador es:</small><br><span style='font-size: 3.5rem; color: #8b0000;'>" + winner + "</span><br><button onclick='this.parentElement.style.display=\"none\"' style='margin-top:10px; cursor:pointer;'>Cerrar</button>";
-                    winnerEl.style.display = 'block';
+                    showWinner(currentWinner);
                     return;
                 }
-                const easeOut = (t, b, c, d) => {
-                    t /= d; t--;
-                    return c * (t * t * t + 1) + b;
-                };
-                const delta = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
-                startAngle += (delta * Math.PI / 180);
+                const easeOut = (t, b, c, d) => { t /= d; t--; return c * (t * t * t + 1) + b; };
+                startAngle += ((spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal)) * Math.PI / 180);
                 drawRoulette();
                 setTimeout(rotate, 30);
             }
             rotate();
         }
 
+        function showWinner(name) {
+            winnerNameEl.innerText = name;
+            winnerEl.style.display = 'block';
+            isClaimPhase = true;
+            timerSeconds = 30;
+            countdownEl.innerText = timerSeconds;
+            countdownEl.style.color = "#8b0000";
+            claimStatusEl.innerText = "¡DEBE HABLAR EN EL CHAT PARA RECLAMAR!";
+            
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                countdownEl.innerText = timerSeconds;
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    if (isClaimPhase) {
+                        isClaimPhase = false;
+                        claimStatusEl.innerText = "¡TIEMPO AGOTADO! SIN RECLAMO.";
+                        countdownEl.innerText = "⌛";
+                    }
+                }
+            }, 1000);
+        }
+
+        function claimPrize() {
+            clearInterval(timerInterval);
+            isClaimPhase = false;
+            claimStatusEl.innerText = "✅ ¡PREMIO RECLAMADO CON ÉXITO! ✅";
+            countdownEl.innerText = "🎉";
+            countdownEl.style.color = "#228b22";
+        }
+
+        function closeWinnerDisplay() {
+            winnerEl.style.display = 'none';
+            clearInterval(timerInterval);
+            isClaimPhase = false;
+        }
+
         function resetParticipants() {
             participants = [];
             updateUI();
-            winnerEl.style.display = 'none';
+            closeWinnerDisplay();
         }
 
         window.spinWheel = spinWheel;
-        window.resetParticipants = resetParticipants;
         window.removeParticipant = removeParticipant;
     </script>
 </body>
