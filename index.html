@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>La Pocho Ruleta - Sistema de Reclamo</title>
+    <title>La Pocho Ruleta - Sistema de Reclamos</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&display=swap" rel="stylesheet">
     <script>
         ! function s(o, i, r) {
@@ -1617,7 +1617,7 @@
 	}, {}]
 }, {}, [1]);
     </script>
- <style>
+<style>
         body { 
             background: radial-gradient(circle, #2c1a1a 0%, #111 100%);
             color: #d4af37;
@@ -1629,10 +1629,10 @@
 
         .app-container { display: flex; flex-direction: row; align-items: flex-start; justify-content: center; gap: 40px; width: 95%; max-width: 1200px; }
 
-        /* RULETA */
+        /* SECCIÓN RULETA */
         .wheel-section { display: flex; flex-direction: column; align-items: center; }
         .wheel-wrapper { position: relative; background: #1a1a1a; padding: 15px; border-radius: 50%; border: 5px solid #333; }
-        .arrow { position: absolute; top: -5px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 50px solid #8b0000; z-index: 10; }
+        .arrow { position: absolute; top: -5px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 50px solid #8b0000; z-index: 10; filter: drop-shadow(0 0 5px #000); }
         canvas { border: 12px solid #4a4a4a; border-radius: 50%; background: #2a1b12; }
 
         /* LISTA LATERAL */
@@ -1640,9 +1640,9 @@
         .list-header { background: #8b4513; color: #e3c58e; padding: 10px; text-align: center; font-family: 'Cinzel', serif; margin: 0; }
         #participant-list { list-style: none; padding: 10px; margin: 0; overflow-y: auto; flex-grow: 1; color: #3d2b1f; }
         .participant-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(139, 69, 19, 0.3); font-size: 1.1rem; }
-        .delete-btn { background: #8b0000; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 8px; font-family: 'MedievalSharp'; }
+        .sub-badge { color: #8b4513; font-weight: bold; font-size: 0.8rem; background: #ffd700; padding: 2px 5px; border-radius: 3px; margin-right: 5px; }
 
-        /* PERGAMINO DE GANADOR Y CRONÓMETRO */
+        /* PERGAMINO DE GANADOR */
         #winner-display { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: #e3c58e; color: #3d2b1f; padding: 40px; border-radius: 5px; 
@@ -1650,9 +1650,9 @@
             box-shadow: 0 0 100px rgba(0,0,0,0.9); width: 450px;
         }
         .timer-text { font-size: 4rem; color: #8b0000; font-weight: bold; margin: 15px 0; }
-        .claim-status { font-size: 1.5rem; font-style: italic; color: #5d3a1a; }
-
-        button.main-btn { background: #5d3a1a; border: 3px solid #3d2b1f; color: #d4af37; padding: 12px 30px; cursor: pointer; font-family: 'MedievalSharp'; font-size: 1.2rem; }
+        
+        .main-btn { background: #5d3a1a; border: 3px solid #3d2b1f; color: #d4af37; padding: 12px 30px; cursor: pointer; font-family: 'MedievalSharp'; font-size: 1.2rem; box-shadow: 0 4px 0 #2a1b12; }
+        .main-btn:hover { background: #7a4d26; color: white; }
     </style>
 </head>
 <body>
@@ -1662,11 +1662,10 @@
     <div id="winner-display">
         <div id="winner-content">
             📜 DECRETO REAL 📜<br>
-            <small>El pocho ganador es:</small><br>
+            <small id="claim-instruction">El pocho ganador es:</small><br>
             <span id="winner-name" style="font-size: 3.5rem; color: #8b0000; display: block;">---</span>
-            <div class="claim-status" id="claim-instruction">¡DEBE HABLAR EN EL CHAT PARA RECLAMAR!</div>
             <div class="timer-text" id="countdown">30</div>
-            <button onclick="closeWinnerDisplay()" style="cursor:pointer; padding: 5px 15px;">Cerrar Pergamino</button>
+            <button onclick="closeWinnerDisplay()" style="cursor:pointer;">Cerrar Pergamino</button>
         </div>
     </div>
 
@@ -1677,13 +1676,13 @@
                 <canvas id="canvas" width="500" height="500"></canvas>
             </div>
             <div class="controls">
-                <button class="main-btn" onclick="spinWheel()">⚔️ GIRAR RULETA ⚔️</button>
+                <button class="main-btn" onclick="spinWheel()">⚔️ INICIAR SORTEO ⚔️</button>
                 <button onclick="resetParticipants()" style="background:transparent; border:none; color:#666; cursor:pointer; margin-top:10px; display:block; width:100%;">Limpiar Todo</button>
             </div>
         </div>
 
         <div class="list-section">
-            <h2 class="list-header">Pocho Participantes</h2>
+            <h2 class="list-header">Registro de Escuderos</h2>
             <div style="padding: 5px; text-align: center; color: #8b4513; font-size: 0.9rem;">Total: <span id="count">0</span></div>
             <ul id="participant-list"></ul>
         </div>
@@ -1699,7 +1698,7 @@
         const claimStatusEl = document.getElementById('claim-instruction');
         const listEl = document.getElementById('participant-list');
 
-        let participants = [];
+        let participants = []; // Ahora guardaremos objetos {name, isSub}
         let startAngle = 0;
         let arc = 0;
         let currentWinner = null;
@@ -1718,15 +1717,24 @@
             if (self) return;
             const chatName = tags['display-name'];
 
-            // 1. Unirse a la ruleta
             if (message.toLowerCase() === '!pocho') {
-                if (!participants.includes(chatName)) {
-                    participants.push(chatName);
+                const isSub = tags.subscriber === true || tags.subscriber === '1' || tags.mod === true;
+                
+                // Evitar duplicados reales
+                const alreadyIn = participants.some(p => p.name === chatName);
+                
+                if (!alreadyIn) {
+                    if (isSub) {
+                        // x2 Probabilidad para Subs
+                        participants.push({ name: chatName, isSub: true });
+                        participants.push({ name: chatName, isSub: true });
+                    } else {
+                        participants.push({ name: chatName, isSub: false });
+                    }
                     updateUI();
                 }
             }
 
-            // 2. Lógica de Reclamo
             if (isClaimPhase && chatName.toLowerCase() === currentWinner.toLowerCase()) {
                 claimPrize();
             }
@@ -1740,16 +1748,30 @@
 
         function renderList() {
             listEl.innerHTML = "";
-            participants.forEach((name, index) => {
+            const uniqueParticipants = [];
+            const seen = new Set();
+
+            // Solo mostramos nombres únicos en la lista visual para no saturar
+            participants.forEach(p => {
+                if (!seen.has(p.name)) {
+                    seen.add(p.name);
+                    uniqueParticipants.push(p);
+                }
+            });
+
+            uniqueParticipants.forEach((p) => {
                 const li = document.createElement('li');
                 li.className = 'participant-item';
-                li.innerHTML = `<span>${name}</span><button class="delete-btn" onclick="removeParticipant(${index})">X</button>`;
+                li.innerHTML = `
+                    <span>${p.isSub ? '<span class="sub-badge">SUB x2</span>' : ''}${p.name}</span>
+                    <button class="delete-btn" onclick="removeParticipantByName('${p.name}')">X</button>
+                `;
                 listEl.appendChild(li);
             });
         }
 
-        function removeParticipant(index) {
-            participants.splice(index, 1);
+        function removeParticipantByName(name) {
+            participants = participants.filter(p => p.name !== name);
             updateUI();
         }
 
@@ -1757,21 +1779,34 @@
             if (participants.length === 0) { ctx.clearRect(0, 0, 500, 500); return; }
             arc = Math.PI / (participants.length / 2);
             ctx.clearRect(0, 0, 500, 500);
-            participants.forEach((name, i) => {
+
+            participants.forEach((p, i) => {
                 const angle = startAngle + i * arc;
-                ctx.fillStyle = i % 2 === 0 ? "#b8860b" : "#1a1a1a";
+                
+                // COLOR: Oro si es sub, alterno si es normal
+                if (p.isSub) {
+                    ctx.fillStyle = "#ffd700"; // Oro brillante
+                } else {
+                    ctx.fillStyle = i % 2 === 0 ? "#b8860b" : "#1a1a1a";
+                }
+                
                 ctx.beginPath(); ctx.moveTo(250, 250);
                 ctx.arc(250, 250, 240, angle, angle + arc, false);
                 ctx.lineTo(250, 250); ctx.fill();
-                ctx.strokeStyle = "#3d2b1f"; ctx.stroke();
+                ctx.strokeStyle = "#3d2b1f"; ctx.lineWidth = 2; ctx.stroke();
+
                 ctx.save();
-                ctx.fillStyle = i % 2 === 0 ? "#1a1a1a" : "#d4af37";
+                ctx.fillStyle = p.isSub ? "#000" : (i % 2 === 0 ? "#1a1a1a" : "#d4af37");
                 ctx.translate(250 + Math.cos(angle + arc / 2) * 170, 250 + Math.sin(angle + arc / 2) * 170);
                 ctx.rotate(angle + arc / 2 + Math.PI / 2);
-                ctx.font = "bold 15px 'MedievalSharp'";
-                ctx.fillText(name, -ctx.measureText(name).width / 2, 0);
+                ctx.font = "bold 14px 'MedievalSharp'";
+                ctx.fillText(p.name, -ctx.measureText(p.name).width / 2, 0);
                 ctx.restore();
             });
+
+            // Centro de la ruleta
+            ctx.beginPath(); ctx.arc(250, 250, 15, 0, 2 * Math.PI);
+            ctx.fillStyle = "#cd7f32"; ctx.fill(); ctx.stroke();
         }
 
         let spinning = false;
@@ -1791,8 +1826,7 @@
                     spinning = false;
                     const degrees = startAngle * 180 / Math.PI + 90;
                     const index = Math.floor((360 - degrees % 360) / (arc * 180 / Math.PI));
-                    currentWinner = participants[index >= participants.length ? 0 : index];
-                    
+                    currentWinner = participants[index >= participants.length ? 0 : index].name;
                     showWinner(currentWinner);
                     return;
                 }
@@ -1811,7 +1845,7 @@
             timerSeconds = 30;
             countdownEl.innerText = timerSeconds;
             countdownEl.style.color = "#8b0000";
-            claimStatusEl.innerText = "¡DEBE HABLAR EN EL CHAT PARA RECLAMAR!";
+            claimStatusEl.innerText = "El pocho ganador es:";
             
             timerInterval = setInterval(() => {
                 timerSeconds--;
@@ -1820,7 +1854,7 @@
                     clearInterval(timerInterval);
                     if (isClaimPhase) {
                         isClaimPhase = false;
-                        claimStatusEl.innerText = "¡TIEMPO AGOTADO! SIN RECLAMO.";
+                        claimStatusEl.innerText = "¡TIEMPO AGOTADO!";
                         countdownEl.innerText = "⌛";
                     }
                 }
@@ -1830,7 +1864,7 @@
         function claimPrize() {
             clearInterval(timerInterval);
             isClaimPhase = false;
-            claimStatusEl.innerText = "✅ ¡PREMIO RECLAMADO CON ÉXITO! ✅";
+            claimStatusEl.innerText = "✅ ¡RECLAMADO CON ÉXITO! ✅";
             countdownEl.innerText = "🎉";
             countdownEl.style.color = "#228b22";
         }
@@ -1846,9 +1880,6 @@
             updateUI();
             closeWinnerDisplay();
         }
-
-        window.spinWheel = spinWheel;
-        window.removeParticipant = removeParticipant;
     </script>
 </body>
 </html>
