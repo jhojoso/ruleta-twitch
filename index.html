@@ -1703,7 +1703,7 @@
         let arc = 0;
         let currentWinner = null;
         let isClaimPhase = false;
-        let timerSeconds = 30;
+        let timerSeconds = 60;
         let timerInterval = null;
 
         const client = new tmi.Client({
@@ -1842,7 +1842,7 @@
             winnerNameEl.innerText = name;
             winnerEl.style.display = 'block';
             isClaimPhase = true;
-            timerSeconds = 30;
+            timerSeconds = 60;
             countdownEl.innerText = timerSeconds;
             countdownEl.style.color = "#8b0000";
             claimStatusEl.innerText = "El pocho ganador es:";
